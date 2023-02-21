@@ -34,7 +34,7 @@ jobs:
         with:
           image: 'dependency-check-action'
           addLatest: true
-          tags: ${{ steps.time.outputs.time }}_${{ steps.vars.outputs.github_sha_short }}
+          tags: ${{ steps.time.outputs.time }}_${{ steps.vars.outputs.github_sha_short }}, latest
           dockerfile: ./Dockerfile
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.GHCR_USERNAME }}
