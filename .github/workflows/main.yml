@@ -9,16 +9,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build latest images
-        run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker build -t owasp/dependency-check-action:latest .
-          docker push owasp/dependency-check-action:latest
-      - name: Update Published Date
-        run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
-          echo "Last Published: $(date)" > published.md
-          git commit -am "published"
-          git push origin main
 
+      - name: Declare some variables
+        id: vars
+        shell: bash
+        run: |
+          echo "::set-output name=github_sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Get Time
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          timeZone: 0
+          format: 'YYYYMMDD'
+
+      - name: Build & push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: ${{github.event.repository.name}}
+          addLatest: true
+          tags: ${{ steps.time.outputs.time }}_${{ steps.vars.outputs.github_sha_short }}
+          dockerfile: ./Dockerfile
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_PASSWORD }}
