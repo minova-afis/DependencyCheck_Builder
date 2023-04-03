@@ -16,25 +16,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Declare some variables
-        id: vars
-        shell: bash
-        run: |
-          echo "::set-output name=github_sha_short::$(git rev-parse --short HEAD)"
-
-      - name: Get Time
+      - name: get date
         id: time
-        uses: nanzm/get-time-action@v1.1
+        uses: boredland/get-time-action@2.0.0
         with:
-          timeZone: 0
+          timeZone: UTC
           format: 'YYYYMMDD'
 
-      - name: Build & push Docker image
+      - name: prepare container image name
+        id: container-name-and-githash
+        shell: bash
+        run: |
+          GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
+          echo "github_sha_short=$GITHUB_SHA_SHORT" >> $GITHUB_OUTPUT
+          echo "container-image=${{inputs.registry}}/${{github.repository_owner}}/${{github.event.repository.name}}:${{ steps.time.outputs.time }}_$GITHUB_SHA_SHORT" >> $GITHUB_OUTPUT
+
+      - name: build & push container image '${{ steps.container-name-and-githash.outputs.container-image }}'
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
           image: 'dependency-check-action'
           addLatest: true
-          tags: ${{ steps.time.outputs.time }}_${{ steps.vars.outputs.github_sha_short }}, latest
+          tags: ${{ steps.time.outputs.time }}_${{ steps.container-name-and-githash.outputs.github_sha_short }}, latest
           dockerfile: ./Dockerfile
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.GHCR_USERNAME }}
