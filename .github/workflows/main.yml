@@ -37,7 +37,7 @@ jobs:
           image: 'dependency-check-action'
           addLatest: true
           tags: ${{ steps.time.outputs.time }}_${{ steps.container-name-and-githash.outputs.github_sha_short }}, latest
-          buildArgs: "NIST_NVD_API_KEY=${{NIST_NVD_API_KEY}}"
+          buildArgs: "NIST_NVD_API_KEY=${{secrets.NIST_NVD_API_KEY}}"
           dockerfile: './Dockerfile'
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.GHCR_USERNAME }}
