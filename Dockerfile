@@ -5,5 +5,9 @@ LABEL org.opencontainers.image.source="https://github.com/minova-afis/Dependency
       maintainer="scholz@minova.aero"
 
 USER root
-RUN /usr/share/dependency-check/bin/dependency-check.sh --updateonly
+
+ARG NIST_NVD_API_KEY="NVD_API_KEY_IS_UNSET"
+ENV NIST_NVD_API_KEY=${NIST_NVD_API_KEY}
+
+RUN /usr/share/dependency-check/bin/dependency-check.sh --updateonly --nvdApiKey $NIST_NVD_API_KEY
 ENTRYPOINT [ "/usr/share/dependency-check/bin/dependency-check.sh"]
