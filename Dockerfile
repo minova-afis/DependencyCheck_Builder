@@ -9,5 +9,5 @@ USER root
 ARG NIST_NVD_API_KEY="NVD_API_KEY_IS_UNSET"
 ENV NIST_NVD_API_KEY=${NIST_NVD_API_KEY}
 
-RUN /usr/share/dependency-check/bin/dependency-check.sh --updateonly --nvdApiKey $NIST_NVD_API_KEY
+RUN /usr/share/dependency-check/bin/dependency-check.sh --updateonly --nvdApiKey $NIST_NVD_API_KEY --nvdApiDelay 1000
 ENTRYPOINT [ "/usr/share/dependency-check/bin/dependency-check.sh"]
